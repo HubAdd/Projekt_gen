@@ -9,11 +9,12 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1200, 800), "InGenious");
-    Engine E(4);
-    E.main_game_loop(window);
 
-    //git hub test
+        Engine E;
+        E.main_game_loop();
+
+
+
 
 
 

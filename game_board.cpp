@@ -1,7 +1,7 @@
 #include "game_board.h"
 #include <cmath>
 
-
+game_board::game_board(){}
 void game_board::reset()
 {
     for(auto &x : vec1)
@@ -60,4 +60,9 @@ void game_board::reset_lines()
         x->setOutlineColor(sf::Color::Cyan);
         x->setOutlineThickness(2);
     }
+}
+
+void game_board::draw(sf::RenderTarget& target, sf::RenderStates states) const{
+    for(const auto & x : vec1)
+        target.draw(*x, states);
 }
