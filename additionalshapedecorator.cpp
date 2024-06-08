@@ -48,3 +48,8 @@ void AdditionalShapeDecorator::setposition (sf::Vector2f pos){
 }
 sf::Color AdditionalShapeDecorator::get_color_(){if(additionalShape_->getFillColor() != sf::Color::Transparent){return additionalShape_->getFillColor();}else{return additionalShape_->getOutlineColor();}}
 unsigned int AdditionalShapeDecorator::get_type_ () {return static_cast <CustomShape*>(additionalShape_.get())->get_type();}
+
+void AdditionalShapeDecorator::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    target.draw(static_cast<sextangle>(*this));
+    target.draw(*additionalShape_, states);
+}

@@ -56,3 +56,8 @@ bool Token::mouse_on_token(sf::RenderWindow &window)
     return token_pair.first->mouse_on(window) || token_pair.second->mouse_on(window);
 }
 
+void Token::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    target.draw(*token_pair.first, states);
+    target.draw(*token_pair.second, states);
+}
+

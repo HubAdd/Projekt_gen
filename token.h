@@ -8,10 +8,7 @@ class Token : public sf::Drawable
 {
 public:
     Token(float size);
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        target.draw(*token_pair.first, states);
-        target.draw(*token_pair.second, states);
-    }
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override ;
     void move(const sf::RenderWindow & window);
     void align(const sf::Vector2f & move_vec);
     void rotate();
