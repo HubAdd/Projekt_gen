@@ -16,6 +16,7 @@ SOURCES += \
         _circle_shape.cpp \
         additionalshapedecorator.cpp \
         button.cpp \
+        custom_rectangle.cpp \
         customshape.cpp \
         engine.cpp \
         game_board.cpp \
@@ -26,6 +27,8 @@ SOURCES += \
         menu.cpp \
         player.cpp \
         round_counter.cpp \
+        score_board.cpp \
+        setings.cpp \
         sextangle.cpp \
         starshape.cpp \
         starshape1.cpp \
@@ -37,6 +40,7 @@ HEADERS += \
     _circle_shape.h \
     additionalshapedecorator.h \
     button.h \
+    custom_rectangle.h \
     customshape.h \
     engine.h \
     game_board.h \
@@ -46,6 +50,8 @@ HEADERS += \
     menu.h \
     player.h \
     round_counter.h \
+    score_board.h \
+    setings.h \
     sextangle.h \
     starshape.h \
     starshape1.h \

@@ -3,6 +3,7 @@
 #include "round_counter.h"
 #include <chrono>
 #include <cmath>
+#include <iostream>
 #include <thread>
 
 laid_Token::laid_Token() {}
@@ -23,7 +24,7 @@ void laid_Token::laid (Engine & E)
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
                 {
                     t->get()->rotate();
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
                 {
@@ -117,6 +118,7 @@ void laid_Token::laid (Engine & E)
 
                                 finding_sextangle_that_is_the_same_color_as_this_token(t->get()->token_pair.first);
                                 finding_sextangle_that_is_the_same_color_as_this_token(t->get()->token_pair.second);
+                                (*E.score_boards)[E.round_counter->get_round()].ilustrate_possible_points(Points_ , E.players_map->at(E.round_counter->get_round()).Points);
                             }
 
                             E.controls[E.controls.size()-1] = true;
@@ -134,29 +136,120 @@ void laid_Token::laid (Engine & E)
                                 {
                                     E.controls[E.controls.size()-1] = false;
                                     E.board->reset_lines();
+                                    (*E.score_boards)[E.round_counter->get_round()].erase_ilustration();
 
                                 }
                                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
                                 {
+                                    //Dźwięk
+                                    E.sound.setBuffer(E.t.boop);
+
+                                    // Odtwórz dźwięk
+                                    E.sound.play();
+
+                                    //wymazanie linii ktore pokazywaly ciąg tokenów na planszy
                                     E.board->reset_lines();
+
+                                    //wymazanie ścieżek ktore pokazywaly ciąg tokenów na scorebordzie
+                                    (*E.score_boards)[E.round_counter->get_round()].erase_ilustration();
+
+                                    //ozdabianie szesciokatow na planszy, na ktorych polozono token
                                     auto s = std::move(*it);
                                     auto s1 = std::move(*it1);
                                     *it = std::make_unique<AdditionalShapeDecorator>(std::move(s),t->get()->get_types().first);
                                     *it1 = std::make_unique<AdditionalShapeDecorator>(std::move(s1),t->get()->get_types().second);
+
+                                    //wyrównywanie znaczkow z szesciokatami na ktorych sa
                                     static_cast<AdditionalShapeDecorator*>(it->get())->setposition(it->get()->getPosition());
                                     static_cast<AdditionalShapeDecorator*>(it1->get())->setposition(it1->get()->getPosition());
+
+                                    //zakonczenie petli zwiazanych z kladzeniem tokena
                                     E.controls[E.controls.size()-1] = false;
                                     E.controls[E.controls.size()-2] = false;
+
+                                    //losowanie nowych znaczkow na tokenie
                                     t->get()->token_switch( (rand()%6)+1 , (rand()%6)+1 );
+
+                                    //dodawanie punktow graczowi
                                     E.players_map->at(E.round_counter->get_round()).add_point(Points_);
+
+                                    //wyrownanie tokenow
                                     E.align_tokens();
-                                    E.gen();
-                                    E.window.display();
-                                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+                                    //zegar bedzie potrzebny do animacjii na scoreboardzie
+                                    sf::Clock clock;
+
+                                    //bool ktory sprawdza czy ktorys z graczy osiagnal 18 pkt w ktoryms z kolorow
+                                    bool InGenious = std::any_of(E.players_map->at(E.round_counter->get_round()).Points.begin() , E.players_map->at(E.round_counter->get_round()).Points.end() , [&E](const std::pair <unsigned int , unsigned int> & p)
+                                    {
+                                        //bool ktory sprawdza czy gracz juz osiagnal wczesniej geniusza z tego koloru
+                                        bool was_Genious = E.players_map->at(E.round_counter->get_round()).Is_Genious[p.first];
+                                        if(!was_Genious and p.second == 18)
+                                        {
+                                            E.players_map->at(E.round_counter->get_round()).Is_Genious[p.first] = true;
+                                            return true;
+                                        }
+                                        else
+                                            return false;
+                                    });
+
+                                    if(InGenious)
+                                    {
+                                        E.Ingenious = std::make_unique <sf::Text> ();
+                                        E.Ingenious->setFont(E.t.font);
+                                        E.Ingenious->setString("InGenious");
+                                        E.Ingenious->setCharacterSize(200);
+                                        E.Ingenious->setPosition(E.window.getSize().x/2-400,E.window.getSize().y-400);
+                                        E.Ingenious->setFillColor(sf::Color::Black);
+
+                                        //Dźwięk
+                                        E.sound.setBuffer(E.t.genius);
+
+                                        // Odtwórz dźwięk
+                                        E.sound.play();
+                                    }
+                                    for(unsigned int num = 1 ; num <= 6 ; num++)
+                                    {
+                                        while(!E.score_boards->at(E.round_counter->get_round()).stop_animation(num , E.players_map->at(E.round_counter->get_round()).Points[num]))
+                                        {
+                                            auto elapsed = clock.restart();
+                                            E.score_boards->at(E.round_counter->get_round()).move_(num,100*elapsed.asSeconds());
+                                            E.gen();
+                                            if(InGenious)
+                                            {
+                                                E.window.draw(*E.Ingenious.get());
+                                                E.Ingenious->setFillColor(sf::Color(rand()%255,rand()%255,rand()%255));
+                                            }
+                                            E.window.display();
+
+                                        }
+                                    }
+                                    if(InGenious)
+                                    {
+                                        E.gen();
+                                        E.window.draw(*E.Ingenious.get());
+                                        E.window.display();
+                                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                                        E.Ingenious.get_deleter();
+                                    }
+                                    else
+                                    {
+                                        E.gen();
+                                        E.window.display();
+                                        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                                    }
+
+
                                     E.players_map->at(E.round_counter->get_round()).change({E.vectok->at(0).get()->get_types(),E.vectok->at(1).get()->get_types(),E.vectok->at(2).get()->get_types(),E.vectok->at(3).get()->get_types(),E.vectok->at(4).get()->get_types(),E.vectok->at(5).get()->get_types()});
-                                    E.next_round();
+                                    if(!InGenious)
+                                        E.next_round();
                                     E.align_tokens();
-                                    E.players_map->at(E.round_counter->get_round()).show();
+                                    if(E.board->no_space())
+                                    {
+                                        E.EndGame();
+                                    }
+                                        //E.controls[2]=false;
+
                                 }
 
                             }
@@ -175,3 +268,6 @@ void laid_Token::laid (Engine & E)
 
 
 }
+
+
+

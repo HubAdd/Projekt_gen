@@ -8,10 +8,9 @@ public:
     sextangle(const float &size);
     bool mouse_on (const sf::RenderWindow & window);
     bool vec_on (const sf::Vector2i &vec);
-    float h_(){return h;}
+    float h_();
     friend class Token;
-protected:
-    float h;
+
 };
 
 #endif // SEXTANGLE_H

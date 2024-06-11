@@ -31,7 +31,7 @@ void Token::align(const sf::Vector2f & move_vec)
 
         return rotatedVec;
     };
-    auto z = sf::Vector2f({0,static_cast<float>(token_pair.first->h*2.05)});
+    auto z = sf::Vector2f({0,static_cast<float>(token_pair.first->h_()*2.05)});
     auto s = rotateVector(z, rotation*60);
     static_cast<AdditionalShapeDecorator*>(token_pair.second.get())->setposition(move_vec+s);
 }

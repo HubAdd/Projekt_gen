@@ -5,7 +5,7 @@ sextangle::sextangle(const float &size):
     sf::ConvexShape(){
 
     setPointCount(6);
-    h=sqrt(3)*size/2;
+    float h=sqrt(3)*size/2;
     const float a=size/2;
     setPoint(0, {2*a,0});
     setPoint(1, {a,h});
@@ -20,7 +20,7 @@ bool sextangle::vec_on (const sf::Vector2i &vec)
     sf::Vector2f circleCenter = getPosition();
 
     // Pobranie promienia koła
-    float radius = h;
+    float radius = h_();
 
     // Obliczenie odległości między pozycją kursora a środkiem koła
     float distance = std::sqrt(std::pow(vec.x - circleCenter.x, 2) + std::pow(vec.y - circleCenter.y, 2));
@@ -34,4 +34,10 @@ bool sextangle::mouse_on (const sf::RenderWindow & window)
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
     return vec_on(mousePos);
+}
+float sextangle::h_()
+{
+    float a=(getPoint(1).x-getPoint(2).x)/2;
+    float h=sqrt(3)*a;
+    return h;
 }
