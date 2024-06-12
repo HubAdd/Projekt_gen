@@ -42,6 +42,12 @@ bool Texture_pack::load_textures()
         return false;
     if(!party.loadFromFile("party.wav"))
         return false;
+    if(!street.loadFromFile("street.wav"))
+        return false;
+    if(!guitar.loadFromFile("guitar.wav"))
+        return false;
+    if(!RIO.loadFromFile("RIO-REMIX.wav"))
+        return false;
 
     //=================================================================================================================
 

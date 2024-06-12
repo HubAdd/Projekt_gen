@@ -15,7 +15,6 @@ public:
     void add_point (std::map <unsigned int, unsigned int> & Points_);
     std::vector <unsigned int> pkt();
     std::string nick_();
-    void show();
     friend class laid_Token;
 
 private:

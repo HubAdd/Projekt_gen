@@ -3,7 +3,6 @@
 #include "round_counter.h"
 #include <chrono>
 #include <cmath>
-#include <iostream>
 #include <thread>
 
 laid_Token::laid_Token() {}
@@ -142,10 +141,10 @@ void laid_Token::laid (Engine & E)
                                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
                                 {
                                     //Dźwięk
-                                    E.sound.setBuffer(E.t.boop);
+                                    E.sound->setBuffer(E.t.boop);
 
                                     // Odtwórz dźwięk
-                                    E.sound.play();
+                                    E.sound->play();
 
                                     //wymazanie linii ktore pokazywaly ciąg tokenów na planszy
                                     E.board->reset_lines();
@@ -203,10 +202,10 @@ void laid_Token::laid (Engine & E)
                                         E.Ingenious->setFillColor(sf::Color::Black);
 
                                         //Dźwięk
-                                        E.sound.setBuffer(E.t.genius);
+                                        E.sound->setBuffer(E.t.genius);
 
                                         // Odtwórz dźwięk
-                                        E.sound.play();
+                                        E.sound->play();
                                     }
                                     for(unsigned int num = 1 ; num <= 6 ; num++)
                                     {
@@ -230,7 +229,7 @@ void laid_Token::laid (Engine & E)
                                         E.window.draw(*E.Ingenious.get());
                                         E.window.display();
                                         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                                        E.Ingenious.get_deleter();
+                                        E.Ingenious.reset();
                                     }
                                     else
                                     {

@@ -31,6 +31,9 @@ public:
     sf::SoundBuffer void_;
     sf::SoundBuffer genius;
     sf::SoundBuffer party;
+    sf::SoundBuffer street;
+    sf::SoundBuffer guitar;
+    sf::SoundBuffer RIO;
 
     std::vector <sf::Texture> logo_animation;
 
