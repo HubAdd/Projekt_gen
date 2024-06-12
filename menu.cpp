@@ -19,7 +19,7 @@ void Menu::initiate_main_menu(Texture_pack & t, sf::RenderWindow & window)
     screen.setPosition(0,0);
     screen.setSize({static_cast<float>(window.getSize().x),static_cast<float>(window.getSize().y)});
 
-    buts.emplace_back(Button({195,600},t.Four_P,t.font1,"Load Game",0.2));
+    buts.emplace_back(Button({195,600},t.Four_P,t.font1,"Exit",0.2));
     buts.emplace_back(Button({1345,600},t.Four_P,t.font1,"New Game",0.2));
 
     std::for_each(buts.begin(),buts.end(),[](Button & b){b.text.move(0,12);});

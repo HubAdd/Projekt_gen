@@ -32,18 +32,7 @@ void Player::add_point (std::map < unsigned int , unsigned int > & Points_)
 
 }
 
-void Player::show()
-{
-    std::cout << "Pkt Gracza nr " << Player_number << std::endl ;
-    for( int i = 1 ; i <= 6 ; i++)
-    {
-        std::cout << i << " : ";
-        std::cout << Points[i] << std::endl;
 
-    }
-    std::cout << std::endl ;
-
-}
 
 
 std::string Player::nick_(){return nick;};

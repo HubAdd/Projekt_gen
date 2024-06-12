@@ -5,6 +5,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+
 void Engine::main_game_loop()
 {
     //ładowanie tekstur
@@ -14,11 +15,14 @@ void Engine::main_game_loop()
         std::cerr<<"Error loading textures"<<std::endl;
         window.close();
     }
+
+    //ustawianie ikony okna
     window.setIcon(t.icon.getSize().x, t.icon.getSize().y, t.icon.getPixelsPtr());
 
 
     while (window.isOpen())
     {
+        //ustawianie pierwszego elementu pętli kontrolnej na true
         controls[0]=true;
 
         //tworzenie instancjii menu
@@ -31,6 +35,16 @@ void Engine::main_game_loop()
         {
             //wyswietlanie menu
             menu->gen_menu(window , controls, event, t);
+
+            //sprawdzanie czy przycisk exit został kliknięty
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left) and menu->buts[0].mouse_on(window))
+            {
+                if(setings::displayChoiceWindow("",t.font,t.metal,t.icon))
+                {
+                    window.close();
+                    controls[0]=false;
+                }
+            }
 
             //sprawdzanie czy przycisk menu (new game został kliknięty
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left) and menu->buts[1].mouse_on(window))
@@ -59,23 +73,34 @@ void Engine::main_game_loop()
                     //sprawdzanie czy została wybrana liczba graczy
                     if(menu->click(window))
                     {
+                        //wyswietlenie okna z zapytaniem czy gracz zatwierdza decyzje
                         controls[2]=setings::displayChoiceWindow("",t.font,t.metal,t.icon);
 
                         if(controls[2] == true)
                         {
-                            //inicjowanie gry i usuwanie instacji menu bo juz nie jest potrzebna
-                            initiate_game(menu->p_num_initialization_());
+
+                            {
+                                //tworzenie nicków graczy (tyle graczy ile wynosi initialization_() - liczba graczy wybrana w menu)
+                                std::vector <std::string> nicks (menu->p_num_initialization_());
+
+                                //tworzenie okien gdzie poszczególni gracze wpisują nick
+                                for(unsigned int i = 1 ; i <= nicks.size() ; i++)
+                                    nicks[i-1]=setings::getInputFromWindow(t.font,t.icon,"Player " + std::to_string(i) + " nick");
+
+                                //inicjowanie gry i usuwanie instacji menu bo juz nie jest potrzebna
+                                initiate_game(nicks);
+                            }
+
                             while (controls[2]==true)
                             {
                                 //petla gry
                                 gen();
+
+                                //obsługa zdarzenia położenia tokenu
                                 laid_Token::laid(*this);
-                                if(seting->setings_click(window,t))
-                                {
-                                    controls[2]=false;
-                                    controls[1]=false;
-                                    controls[0]=false;
-                                }
+
+                                //obsługa zdarzenia gdzie przycisk menu został kliknięty
+                                seting->setings_click(*this);
 
                                 window.display();
                             }
@@ -94,11 +119,13 @@ void Engine::main_game_loop()
 }
 void Engine::gen()
 {
+    //obsługa zdarzenia zamknięcia okna
     while (window.pollEvent(event)) {
 
         if (event.type == sf::Event::Closed)
         {
             window.close();
+            //ustawienie petli kontroli na false, by na pewno przerwać każdą pętle
             for(auto it = controls.begin() ; it != controls.end() ; ++it)
             {
                 *it = false;
@@ -106,26 +133,24 @@ void Engine::gen()
         }
     }
     window.clear(sf::Color(230,255,255));
+    //rysowanie wszystkich obiektów z Engine
     window.draw(*this);
 }
 void Engine::align_tokens()
 {
-
-    for(int i = 0 ; i <= 5 ; i++)
+    //iteracja i służy przypisywaniu kolejnych pozycjii tokenom
+    for(unsigned int i = 0 ; i <= 5 ; i++)
         {
-        vectok.get()->at(i)->reset_rotation();
-        vectok.get()->at(i)->align({static_cast<float>(window.getSize().x-750+100*i), 80});
+        vectok->at(i)->reset_rotation();
+        vectok->at(i)->align({static_cast<float>(window.getSize().x-750+100*i), 80});
         }
 }
 
+//nadpisanie metody draw
 void Engine::draw(sf::RenderTarget& target, sf::RenderStates states) const{
     target.draw(*screen,states);
     target.draw(*board, states);
-    std::for_each(vectok->begin(),vectok->end(),[&states, &target](const std::unique_ptr <Token> & x)
-    {
-        if(x != NULL)
-            target.draw(*x,states);
-    });
+    std::for_each(vectok->begin(),vectok->end(),[&states, &target](const std::unique_ptr <Token> & x){target.draw(*x,states);});
     target.draw(*round_counter, states);
     for(auto it = score_boards->begin() ; it != score_boards->end() ; ++it)
         target.draw(it->second, states);
@@ -134,32 +159,52 @@ void Engine::draw(sf::RenderTarget& target, sf::RenderStates states) const{
 
 }
 
-void Engine::initiate_game(const unsigned int & p_num)
+void Engine::initiate_game(const std::vector <std::string> & nicks_)
 {
+    const unsigned int p_num = nicks_.size();
     vectok = std::make_unique <std::vector <std::unique_ptr<Token>>> ();
+
+    //inicjowanie game board z wykorzystaniem wczytanej jako argument liczby graczy
     board = std::make_unique <game_board> (p_num);
+
     players_map = std::make_unique <std::map <unsigned int, Player>> ();
+    //inicjowanie obiektu round counter z pierwszą teksturą (1 runda wiec Player_one)
     round_counter = std::make_unique <Round_Counter> (t.Player_One);
+
     screen = std::make_unique <sf::RectangleShape> ();
     score_boards = std::make_unique <std::map <unsigned int, Score_board>> ();
+
+    //inicjowanie setings wczytując opowiednie tekstury dla przycisków, przekazując obiekt t
     seting = std::make_unique <setings> (t);
 
+    //inicjowanie dźwieku
+    sound = std::make_unique <sf::Sound> ();
 
+    //wygenerowanie planszy
     board->new_board(window);
+
+    //wczytanie tekstury ekranu
     screen->setTexture(&t.main_screen);
+
+    //pozycjonowanie ekranu
     screen->setPosition({0,0});
 
+    //scalowanie ekranu
     screen->setSize({static_cast<float>(window.getSize().x),static_cast<float>(window.getSize().y)});
 
-    for(int i = 0; i < 6; i++)
+    //generowanie 6 tokenów
+    for(unsigned int i = 0; i < 6; i++)
     {
         vectok->emplace_back(std::make_unique<Token>(board->size_()));
     }
+
+    //generowanie odpowiedniej liczby graczy i scoreboardów
     for(unsigned int i = 1 ; i <= p_num ; i++)
     {
-        std::string nick = setings::getInputFromWindow(t.font,t.icon,"Player " + std::to_string(i) + " nick");
-        (*players_map)[i] = Player(nick,i);
+        //przypisywanie graczom nicku i numeru
+        (*players_map)[i] = Player(nicks_[i-1],i);
 
+        //dla scorebordów graczy 3 i 4 (i > 2)pozycja jest po prawej stronie planszy a dla 1 i 2 po lewej
         if(i > 2)
             (*score_boards)[i] = Score_board(sf::Vector2f(window.getSize().x-250*(i%2+1)-30,250),t.font,t.metal,(*players_map)[i].nick_());
         else
@@ -167,15 +212,19 @@ void Engine::initiate_game(const unsigned int & p_num)
     }
 
     {
-        int i = 0;
+        //iteracja i służy temu by kolejne id tokenów gracza (get_Token_id) były przypisywane do vectok
+        unsigned int i = 0;
         for(auto & x : *vectok )
         {
-            x.get()->token_switch(players_map.get()->at(round_counter->get_round()).get_Token_id(i).first,players_map.get()->at(round_counter->get_round()).get_Token_id(i).second);
+            x.get()->token_switch( players_map.get()->at(round_counter->get_round()) .get_Token_id(i).first  ,  players_map.get()->at(round_counter->get_round()) .get_Token_id(i).second );
             i++;
         }
     }
 
+    //wyrównanie i pozycjonowanie tokenów
     align_tokens();
+
+    //usunięcie menu
     menu.reset();
 }
 
@@ -188,7 +237,7 @@ void Engine::reset_game()
     screen.reset();
     score_boards.reset();
     seting.reset();
-
+    game_theme.reset();
 }
 
 void Engine::next_round()
