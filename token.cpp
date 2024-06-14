@@ -11,6 +11,7 @@ Token::Token(float size):sf::Drawable(){
 
 };
 
+void Token::reset_rotation(){rotation =0;}
 
 void Token::move(const sf::RenderWindow & window)
 {

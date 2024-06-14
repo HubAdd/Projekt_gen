@@ -10,35 +10,54 @@ void laid_Token::laid (Engine & E)
 {
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
     {
+        //zwraca iterator tokenu który został wybrany
         auto t = std::find_if(E.vectok->begin(),E.vectok->end(),[ &E](std::unique_ptr<Token> & t){return t->mouse_on_token(E.window);});
         if(t != E.vectok->end())
         {
+            //włączenie drugiej pętli kontroli
             E.controls[E.controls.size()-2] = true;
             while(E.controls[E.controls.size()-2] == true)
             {
+                //rysowanie obiektów
                 E.gen();
+
+                //poruszanie wybranym tokenem, tam gdzie jest myszka
                 t->get()->move(E.window);
-                E.window.draw(*t->get());
+
+                //rysowanie tokenu
+                //E.window.draw(*t->get());
                 E.window.display();
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
                 {
+                    //po kliknięciu prawym obraca token
                     t->get()->rotate();
+                    //cooldown, by token nie obracał się zbyt szybko
                     std::this_thread::sleep_for(std::chrono::milliseconds(200));
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
                 {
+                    //wyjscie z pętli kontroli
                     E.controls[E.controls.size()-2] = false;
+
+                    //wyrównanie tokenów
                     E.align_tokens();
                 }
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
                 {
+                    //iterator wskazujący pole pod którym jest myszka
                     auto it = std::find_if(E.board->vec1.begin(),E.board->vec1.end(),[&E](std::unique_ptr<sextangle> & s){return s->mouse_on(E.window);});
+
+                    //sprawdzenie czy te pole istnieje i jest białe
                     if(it != E.board->vec1.end() and it->get()->getFillColor() == sf::Color::White)
                     {
+                        //sprawdzanie czy pod drugim fragmencie tokenu jest puste pole
                         auto it1 = std::find_if(E.board->vec1.begin(),E.board->vec1.end(),[ &t](std::unique_ptr<sextangle> & s)
                         {
+                            //puste, czyli białe
                             if(s->getFillColor() == sf::Color::White)
                             {
+
+                                //zwraca wartosc do iteratora
                                 return s->vec_on({static_cast<int>(t->get()->token_pair.second->getPosition().x),static_cast<int>(t->get()->token_pair.second->getPosition().y)});
                             }
                             else
@@ -46,13 +65,27 @@ void laid_Token::laid (Engine & E)
                                 return false;
                             }
                         });
+
+                        //sprawdzenie czy pole zostało poprawnie znalezione
                         if(it1 != E.board->vec1.end())
                         {
+                            //oznaczenie krawędzi sześciokątów które zostały przykryte
+                            //ustawienie tokenu w odpowiednim miejscu, kierując się współrzędnymi pierwszego pola
                             t->get()->align(it->get()->getPosition());
+
+                            //ustawienie koloru obramowania pierwszego pola, takiego jak kolor znaczku, który został na nim położony
                             it->get()->setOutlineColor(t->get()->get_Color().first);
+
+                            //ustawienie widocznych krawędzi
                             it->get()->setOutlineThickness(5);
+
+                            //ustawienie koloru obramowania drugiego pola, takiego jak kolor znaczku, który został na nim położony
                             it1->get()->setOutlineColor(t->get()->get_Color().second);
+
+                            //ustawienie widocznych krawędzi
                             it1->get()->setOutlineThickness(5);
+
+                            //mapa ta bedzie przechowywała potencjalne punkty które zdobędzie gracz, aż do momentu położenia
                             std::map <unsigned int, unsigned int> Points_;
                             {
 
@@ -98,8 +131,10 @@ void laid_Token::laid (Engine & E)
                                         if(iter->get()->getFillColor() == sf::Color::Black)
                                         {
                                             //jesli nie zgadza sie kolor to nie ma sensu dalej przeprowadzac danej petli
-                                        if(static_cast<AdditionalShapeDecorator*>(iter->get())->get_type_() != static_cast<AdditionalShapeDecorator*>(tokenpair_one_or_two.get())->get_type_())
+                                        if(dynamic_cast<AdditionalShapeDecorator*>(iter->get())->get_type_() != dynamic_cast<AdditionalShapeDecorator*>(tokenpair_one_or_two.get())->get_type_())
                                             break;
+
+                                        //jeśli pętla nie została przerwana, doliczamy kolejne pkt i oznaczamy krawędzie kolejnych sześciokątów
                                         iter->get()->setOutlineColor(static_cast<AdditionalShapeDecorator*>(tokenpair_one_or_two.get())->get_color_());
                                         iter->get()->setOutlineThickness(5);
                                         Points_[static_cast<AdditionalShapeDecorator*>(tokenpair_one_or_two.get())->get_type_()]++;
@@ -108,6 +143,7 @@ void laid_Token::laid (Engine & E)
                                             break;
                                         }
                                         y++;
+                                        //po zwiększeniu y++, sprawdzamy kolejny token, pętla dla tej strony sześciokąta się kontynuuje
                                         iter = std::find_if(E.board->vec1.begin(),E.board->vec1.end(),[&vec, &y, &tokenpair_one_or_two](std::unique_ptr<sextangle> & s){return s->vec_on({static_cast<int>(tokenpair_one_or_two->getPosition().x+y*vec.x),static_cast<int>(tokenpair_one_or_two->getPosition().y+y*vec.y)});}) ;
 
                                     }
@@ -115,29 +151,43 @@ void laid_Token::laid (Engine & E)
                                 }
                                 };
 
+                                //wykonanie powyższej funkcji na obu stronach tokena
                                 finding_sextangle_that_is_the_same_color_as_this_token(t->get()->token_pair.first);
                                 finding_sextangle_that_is_the_same_color_as_this_token(t->get()->token_pair.second);
+
+                                //ziilustrowanie możliwych punktów, które gracz zdobędzie gdy zatwierdzi ruch
                                 (*E.score_boards)[E.round_counter->get_round()].ilustrate_possible_points(Points_ , E.players_map->at(E.round_counter->get_round()).Points);
                             }
 
+                            //wejście na ostatni poziom pętli kontrolii
                             E.controls[E.controls.size()-1] = true;
                             while(E.controls[E.controls.size()-1] == true)
                             {
                                 E.gen();
+                                //sześciokąty z pogrubionymi krawędziami i token są rysowane na wierzchu, dla lepszej widoczności
                                 for(const auto & x : E.board->vec1)
                                 {
                                     if(x->getOutlineThickness() == 5)
                                         E.window.draw(*x);
                                 }
+                                //
                                 E.window.draw(*t->get());
                                 E.window.display();
+
+                                //Anulowanie ruchu
                                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
                                 {
+                                    //wyjscie z pętli kontroli
                                     E.controls[E.controls.size()-1] = false;
+
+                                    //usunięcie pogrubionych liń
                                     E.board->reset_lines();
+
+                                    //wymazanie ilustracjii
                                     (*E.score_boards)[E.round_counter->get_round()].erase_ilustration();
 
                                 }
+                                //zatwierdzenie ruchu
                                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
                                 {
                                     //Dźwięk
@@ -159,8 +209,8 @@ void laid_Token::laid (Engine & E)
                                     *it1 = std::make_unique<AdditionalShapeDecorator>(std::move(s1),t->get()->get_types().second);
 
                                     //wyrównywanie znaczkow z szesciokatami na ktorych sa
-                                    static_cast<AdditionalShapeDecorator*>(it->get())->setposition(it->get()->getPosition());
-                                    static_cast<AdditionalShapeDecorator*>(it1->get())->setposition(it1->get()->getPosition());
+                                    dynamic_cast<AdditionalShapeDecorator*>(it->get())->setposition(it->get()->getPosition());
+                                    dynamic_cast<AdditionalShapeDecorator*>(it1->get())->setposition(it1->get()->getPosition());
 
                                     //zakonczenie petli zwiazanych z kladzeniem tokena
                                     E.controls[E.controls.size()-1] = false;
@@ -207,15 +257,22 @@ void laid_Token::laid (Engine & E)
                                         // Odtwórz dźwięk
                                         E.sound->play();
                                     }
+                                    //animacja przesuwania się znaczników punktów gracza
                                     for(unsigned int num = 1 ; num <= 6 ; num++)
                                     {
                                         while(!E.score_boards->at(E.round_counter->get_round()).stop_animation(num , E.players_map->at(E.round_counter->get_round()).Points[num]))
                                         {
+                                            //czas od ostaniej klatki, potrzebny do płynnego przesuwania
                                             auto elapsed = clock.restart();
+
+                                            //dla scorborda o id takim jakim runda, przesuwany jest znacznik dla znaczka o id num
                                             E.score_boards->at(E.round_counter->get_round()).move_(num,100*elapsed.asSeconds());
                                             E.gen();
+
+                                            //w przypadku gry gracz uzyskał Geniusza
                                             if(InGenious)
                                             {
+                                                //nieustannie zmieniająca kolor animacja napisu InGenious
                                                 E.window.draw(*E.Ingenious.get());
                                                 E.Ingenious->setFillColor(sf::Color(rand()%255,rand()%255,rand()%255));
                                             }
@@ -223,26 +280,39 @@ void laid_Token::laid (Engine & E)
 
                                         }
                                     }
+                                    //w przypadku gry gracz uzyskał Geniusza
                                     if(InGenious)
                                     {
                                         E.gen();
+                                        //wyswietlanie napisu
                                         E.window.draw(*E.Ingenious.get());
                                         E.window.display();
+
+                                        //cooldown, żeby napis był widoczny przez jeszcze chwilę
                                         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+                                        //wyczyszczenie wskaźnika do napisu
                                         E.Ingenious.reset();
                                     }
                                     else
                                     {
                                         E.gen();
                                         E.window.display();
+
+                                        //standardowy cooldown przed przejsciem do następnego gracza
                                         std::this_thread::sleep_for(std::chrono::milliseconds(500));
                                     }
 
-
+                                    //zapisanie do danego gracza id jego tokenów, po wylosowaniu się nowego tokenu
                                     E.players_map->at(E.round_counter->get_round()).change({E.vectok->at(0).get()->get_types(),E.vectok->at(1).get()->get_types(),E.vectok->at(2).get()->get_types(),E.vectok->at(3).get()->get_types(),E.vectok->at(4).get()->get_types(),E.vectok->at(5).get()->get_types()});
+                                    //w przypadku Geniusza nie następuje kolejna runda
                                     if(!InGenious)
                                         E.next_round();
+
+                                    //wyrównanie tokenów
                                     E.align_tokens();
+
+                                    //gdy nie ma miejsca na planszy, wywoływany jest koniec gry
                                     if(E.board->no_space())
                                     {
                                         E.EndGame();

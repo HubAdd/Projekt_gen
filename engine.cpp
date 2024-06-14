@@ -37,8 +37,9 @@ void Engine::main_game_loop()
             menu->gen_menu(window , controls, event, t);
 
             //sprawdzanie czy przycisk exit został kliknięty
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left) and menu->buts[0].mouse_on(window))
+            if(menu->exit_click(window))
             {
+                //utworzenie okna zapytania czy na pewno
                 if(setings::displayChoiceWindow("",t.font,t.metal,t.icon))
                 {
                     window.close();
@@ -47,7 +48,7 @@ void Engine::main_game_loop()
             }
 
             //sprawdzanie czy przycisk menu (new game został kliknięty
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left) and menu->buts[1].mouse_on(window))
+            if(menu->new_game_click(window))
             {
                 controls[1]=true;
 
@@ -148,13 +149,14 @@ void Engine::align_tokens()
 
 //nadpisanie metody draw
 void Engine::draw(sf::RenderTarget& target, sf::RenderStates states) const{
+    //rysowanie wszystkich elementów
     target.draw(*screen,states);
     target.draw(*board, states);
-    std::for_each(vectok->begin(),vectok->end(),[&states, &target](const std::unique_ptr <Token> & x){target.draw(*x,states);});
     target.draw(*round_counter, states);
     for(auto it = score_boards->begin() ; it != score_boards->end() ; ++it)
         target.draw(it->second, states);
     target.draw(*seting.get(),states);
+    std::for_each(vectok->begin(),vectok->end(),[&states, &target](const std::unique_ptr <Token> & x){target.draw(*x,states);});
 
 
 }
@@ -230,6 +232,7 @@ void Engine::initiate_game(const std::vector <std::string> & nicks_)
 
 void Engine::reset_game()
 {
+    //wyczyszczenie wszystkich wskaźników
     vectok.reset();
     board.reset();
     round_counter.reset();
@@ -242,11 +245,13 @@ void Engine::reset_game()
 
 void Engine::next_round()
 {
+    //dodanie rundy
     round_counter->add_round(board->players_number(), t);
     {
         int i = 0;
         for(auto & x : *vectok )
         {
+            //zmiana tokenów na aktualne
             x.get()->token_switch(players_map->at(round_counter->get_round()).get_Token_id(i).first,players_map->at(round_counter->get_round()).get_Token_id(i).second);
             i++;
         }
@@ -255,10 +260,12 @@ void Engine::next_round()
 
 void Engine::EndGame()
 {
+    //uzyskiwanie numeru zwyciężcy
     unsigned int winner_num = std::max_element(players_map->begin(),players_map->end(),[](std::pair <unsigned int , Player>  p1 , std::pair <unsigned int , Player> p2){
 
 auto vecp1 = p1.second.pkt();
 auto vecp2 = p2.second.pkt();
+//sprawdzanie kolejnych elementów posortowanych rosnąco wektorów
 for(unsigned int i = 0 ; i <= 5 ; i++)
 {
     if(vecp1[i] != vecp2[i])
@@ -270,7 +277,10 @@ return true;
 
     })->first;
 
+    //inicjacja okna gratulacjii
     sf::RenderWindow win_window(sf::VideoMode(600, 500), "Congratulations! " + std::to_string(winner_num));
+
+    //funkcja służąca do generowania losowych prostokątów (KONFETII)
     auto random_rec = [&win_window](custom_rectangle &my_rectangle)
     {
         sf::Vector2f position(rand()%win_window.getSize().x, rand()%win_window.getSize().y);
@@ -279,18 +289,21 @@ return true;
         my_rectangle.set_bounds(0,win_window.getSize().x,0,win_window.getSize().y);
         auto randomkolor = [](sf::Shape &shape){shape.setFillColor(sf::Color(rand()%255,rand()%255,rand()%255));};
         randomkolor(my_rectangle);
-        //my_rectangle.setFillColor(sf::Color(250,250,250));
     };
-
+    //tworzenie wektora konfetii
     std::vector <custom_rectangle> konfetii(400);
     std::for_each(konfetii.begin(),konfetii.end(),[ &random_rec](custom_rectangle & rec){random_rec(rec);});
+
+    //ustawianie tekstu mówiącego o zwycieżcy
     std::string tex = players_map->at(winner_num).nick_() + " Win";
     sf::Text Text(tex, t.font, 60);
     Text.setFillColor(sf::Color::White);
     Text.setPosition(win_window.getSize().x/2-Text.getGlobalBounds().width/2, win_window.getSize().y/2-Text.getGlobalBounds().height/2.5);
 
+    //zegar slużący do obsługi czasu od ostatniej klatki
     sf::Clock clock;
 
+    //ustawienie ikony okna
     win_window.setIcon(t.icon.getSize().x,t.icon.getSize().y,t.icon.getPixelsPtr());
 
     // Pobieranie uchwytu okna
@@ -299,31 +312,34 @@ return true;
     // Ustawienie okna na zawsze na wierzchu
     SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
+    //ustawienie dźwięku gratulacyjnego
     sf::Sound party_theme;
     party_theme.setBuffer(t.party);
     party_theme.setLoop(true);
     party_theme.play();
 
     while (win_window.isOpen()) {
-        // check all the window's events that were triggered since the last iteration of the loop
 
+        //obsługa czasu od ostatniej klatki
         auto elapsed = clock.restart();
         sf::Event event_;
         while (win_window.pollEvent(event_)) {
-            // "close requested" event: we close the window
+
             if (event_.type == sf::Event::Closed)
                 win_window.close();
 
         }
-
-
-
-        // clear the window with black color
         win_window.clear(sf::Color::Black);
+
+        //rysowanie każdego kawałka konfetii
         std::for_each(konfetii.begin(),konfetii.end(),[&win_window, &elapsed](custom_rectangle & rec){win_window.draw(rec);rec.animate(elapsed);});
+
+        //rysowanie tekstu
         win_window.draw(Text);
         win_window.display();
     }
+
+    //pokazanie opcjii powrotu do menu
     bool end_ = !setings::displayChoiceWindow("",t.font,t.metal,t.icon,"Menu?");
     controls[0] = end_;
     controls[1] = end_;

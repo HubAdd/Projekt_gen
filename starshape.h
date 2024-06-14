@@ -3,6 +3,7 @@
 
 #include "customshape.h"
 
+//jeden ze znaczków (niebieska gwiazda)
 class StarShape : public CustomShape {
 public:
     StarShape(float radius);

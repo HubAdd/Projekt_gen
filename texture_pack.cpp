@@ -4,49 +4,53 @@ Texture_pack::Texture_pack() {}
 
 bool Texture_pack::load_textures()
 {
-    if(!Two_P.loadFromFile("Two_P.png"))
+    if(!Two_P.loadFromFile("Pictures/Two_P.png"))
         return false;
-    if(!Three_P.loadFromFile("Three_P.png"))
+    if(!Three_P.loadFromFile("Pictures/Three_P.png"))
         return false;
-    if(!Four_P.loadFromFile("Four_P.png"))
+    if(!Four_P.loadFromFile("Pictures/Four_P.png"))
         return false;
-    if(!Player_One.loadFromFile("Player_One.png"))
+    if(!Player_One.loadFromFile("Pictures/Player_One.png"))
         return false;
-    if(!Player_Two.loadFromFile("Player_Two.png"))
+    if(!Player_Two.loadFromFile("Pictures/Player_Two.png"))
         return false;
-    if(!Player_Three.loadFromFile("Player_Three.png"))
+    if(!Player_Three.loadFromFile("Pictures/Player_Three.png"))
         return false;
-    if(!Player_Four.loadFromFile("Player_Four.png"))
+    if(!Player_Four.loadFromFile("Pictures/Player_Four.png"))
         return false;
-    if(!screen_.loadFromFile("rec_button4.png"))
+    if(!screen_.loadFromFile("Pictures/rec_button4.png"))
         return false;
-    if(!main_screen.loadFromFile("rec_button3.png"))
+    if(!main_screen.loadFromFile("Pictures/rec_button3.png"))
         return false;
-    if(!font.loadFromFile("Gothic.ttf"))
+    if(!metal.loadFromFile("Pictures/Metalic.png"))
         return false;
-    if(!font1.loadFromFile("Adamina-Regular.ttf"))
+    if(!gold.loadFromFile("Pictures/gold.png"))
         return false;
-    if(!metal.loadFromFile("Metalic.png"))
-        return false;
-    if(!gold.loadFromFile("gold.png"))
+    if(!icon.loadFromFile("Pictures/Two_P.png"))
         return false;
 
-    if(!icon.loadFromFile("Two_P.png"))
+
+    if(!font.loadFromFile("Fonts/Gothic.ttf"))
+        return false;
+    if(!font1.loadFromFile("Fonts/Adamina-Regular.ttf"))
         return false;
 
-    if(!boop.loadFromFile("boop.wav"))
+
+
+
+    if(!boop.loadFromFile("Sounds/boop.wav"))
         return false;
-    if(!void_.loadFromFile("void.wav"))
+    if(!void_.loadFromFile("Sounds/void.wav"))
         return false;
-    if(!genius.loadFromFile("genius.wav"))
+    if(!genius.loadFromFile("Sounds/genius.wav"))
         return false;
-    if(!party.loadFromFile("party.wav"))
+    if(!party.loadFromFile("Sounds/party.wav"))
         return false;
-    if(!street.loadFromFile("street.wav"))
+    if(!street.loadFromFile("Sounds/street.wav"))
         return false;
-    if(!guitar.loadFromFile("guitar.wav"))
+    if(!guitar.loadFromFile("Sounds/guitar.wav"))
         return false;
-    if(!RIO.loadFromFile("RIO-REMIX.wav"))
+    if(!RIO.loadFromFile("Sounds/RIO-REMIX.wav"))
         return false;
 
     //=================================================================================================================

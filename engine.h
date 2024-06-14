@@ -31,6 +31,7 @@ public:
     //klasa odpowiadająca za przechowywanie licznika rundy i zmieniania rundy na następną
     friend class Round_Counter;
 
+    //klasa, która jako jedyna ma dostęp do resetowania gry
     friend class setings;
 
     //metoda z menu która wyświetla menu na oknie należącym do Engine

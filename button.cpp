@@ -7,8 +7,8 @@ Button::Button(){};
 Button::Button(const sf::Vector2f& position, sf::Texture & texture_, sf::Font &font, const std::string & button_text, const float & scale)
 {
 
-    // Ładowanie tekstury
 
+    //ustawienia tekstu
     text.setFont(font);
     text.setString(button_text);
     text.setCharacterSize(37);
@@ -16,21 +16,22 @@ Button::Button(const sf::Vector2f& position, sf::Texture & texture_, sf::Font &f
 
     // Ustawienie sprite'a przycisku
     sprite.setTexture(texture_);
+    sprite.setPosition(position);
+    sprite.setScale(scale,scale);
 
+    //Ustawienie hitboxu
     react = sf::RectangleShape({static_cast<float>(sprite.getLocalBounds().width*scale),static_cast<float>(sprite.getLocalBounds().height*scale)});
     react.setPosition(position);
     text.setPosition(position.x + (react.getLocalBounds().width - text.getGlobalBounds().width) / 2, position.y + (react.getLocalBounds().height - text.getGlobalBounds().height) / 2.5);
 
-    sprite.setPosition(position);
-    //sprite.setTextureRect(sf::IntRect(50, 50, 50, 50));
-    sprite.setScale(scale,scale);
-    // Ustawienie tekstu na przycisku
+
 
 }
 
 // Metoda do rysowania przycisku na oknie
 void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    //rysuje sprite i tekst przycisku
     target.draw(sprite,states);
     target.draw(text);
 }

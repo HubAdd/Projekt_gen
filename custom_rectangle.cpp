@@ -2,14 +2,19 @@
 
 custom_rectangle::custom_rectangle(const sf::Vector2f & pos,const sf::Vector2f & size):
     sf::RectangleShape(size){setPosition(pos);}
+
+//w przypadku nie podania argumentu wielkości, jest ona losowana
 custom_rectangle::custom_rectangle():
     sf::RectangleShape({static_cast<float>(rand()%30+1), static_cast<float>(rand()%30+1)}){}
+
+
 void custom_rectangle::set_speed(const int & x,const int & y,const int & z)
 {
     speed_x=x;
     speed_y=y;
     speed_rotation=z;
 }
+
 void custom_rectangle::set_bounds(const int & a,const int & b,const int & c,const int & d)
 {
     x_bounds.first=a;
@@ -17,10 +22,13 @@ void custom_rectangle::set_bounds(const int & a,const int & b,const int & c,cons
     y_bounds.first=c;
     y_bounds.second=d;
 }
+
 void custom_rectangle::bounce()
 {
     auto lim=getGlobalBounds();
     auto abs=[](int a){if(a>=0){return a;}else{return -a;};};
+
+    //używając zmiennej lim oraz wprowadzonych granic, w momentach zderzeń ze ścianą, odpowiednie prędkości są zmieniane
     if(lim.left<=x_bounds.first)
     {
         speed_x=abs(speed_x);
@@ -46,7 +54,7 @@ void custom_rectangle::bounce()
 void custom_rectangle::animate(const sf::Time &elapsed)
 {
 
-
+    //animacja polega na odpowiedniej rotacjii i przemieszczeniu względem podanego czasu oraz na odpowiednie odbicia
     move(speed_x*elapsed.asSeconds(),speed_y*elapsed.asSeconds());
     rotate(speed_rotation*elapsed.asSeconds());
     bounce();
