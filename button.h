@@ -12,9 +12,9 @@ class Button: public sf::Drawable {
 private:
     sf::Sprite sprite;         // Sprite przycisku
     sf::RectangleShape react;  // HitBox przycisku
-    sf::Text text;
-    friend class Menu;
-    friend class setings;
+    sf::Text text;             //tekst przycisku
+    friend class Menu;         //Deklaracja przyjaźni klasy menu (dla łatwiejszego zmeiniania pozycji tekstu itp;
+    friend class setings;       //Deklaracja przyjaźni klasy setings (dla łatwiejszego zmieniania pozycji tekstu itp;
 
 public:
     Button();
@@ -27,7 +27,7 @@ public:
     // Metoda do sprawdzania, czy myszka jest nad przyciskiem
     bool mouse_on(sf::RenderWindow & window);
 
-    int get_num();
+
 
 };
 

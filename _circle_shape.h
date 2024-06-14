@@ -3,6 +3,7 @@
 
 #include "customshape.h"
 
+//jeden ze znaczków (zielone koło)
 class _Circle_Shape : public CustomShape {
 public:
     // Konstruktor przyjmujący promień jako argument

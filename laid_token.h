@@ -6,6 +6,8 @@ class laid_Token
 {
 public:
     laid_Token();
+
+    //metoda statyczna odpowiadająca za położenie tokenu na planszy
     static void laid (Engine & E);
 };
 

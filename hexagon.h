@@ -3,6 +3,7 @@
 
 #include "customshape.h"
 
+//jeden ze znaczków (pomarańczowy sześciokąt)
 class Hexagon : public CustomShape {
 public:
     // Konstruktor przyjmujący promień jako argument

@@ -102,6 +102,16 @@ bool Menu::back_click(sf::RenderWindow &window)
 
 }
 
+bool Menu::exit_click(sf::RenderWindow &window)
+{
+    return sf::Mouse::isButtonPressed(sf::Mouse::Left) and buts[0].mouse_on(window);
+}
+
+bool Menu::new_game_click(sf::RenderWindow &window)
+{
+    return sf::Mouse::isButtonPressed(sf::Mouse::Left) and buts[1].mouse_on(window);
+}
+
 unsigned int Menu::p_num_initialization_()
 {
     return *std::move(p_num_initialization);
