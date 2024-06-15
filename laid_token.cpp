@@ -125,7 +125,7 @@ void laid_Token::laid (Engine & E)
                                         if(iter == it || iter == it1)
                                         {
                                                 //jesli szesciakaty zawierajace sie w tokenie nie sa takie same to petla jest przerwana
-                                            if(static_cast<AdditionalShapeDecorator*>(t->get()->token_pair.first.get())->get_type_() != static_cast<AdditionalShapeDecorator*>(t->get()->token_pair.second.get())->get_type_())
+                                            if(dynamic_cast<AdditionalShapeDecorator*>(t->get()->token_pair.first.get())->get_type_() != dynamic_cast<AdditionalShapeDecorator*>(t->get()->token_pair.second.get())->get_type_())
                                                 break;
                                         }
                                         if(iter->get()->getFillColor() == sf::Color::Black)
@@ -135,9 +135,9 @@ void laid_Token::laid (Engine & E)
                                             break;
 
                                         //jeśli pętla nie została przerwana, doliczamy kolejne pkt i oznaczamy krawędzie kolejnych sześciokątów
-                                        iter->get()->setOutlineColor(static_cast<AdditionalShapeDecorator*>(tokenpair_one_or_two.get())->get_color_());
+                                        iter->get()->setOutlineColor(dynamic_cast<AdditionalShapeDecorator*>(tokenpair_one_or_two.get())->get_color_());
                                         iter->get()->setOutlineThickness(5);
-                                        Points_[static_cast<AdditionalShapeDecorator*>(tokenpair_one_or_two.get())->get_type_()]++;
+                                        Points_[dynamic_cast<AdditionalShapeDecorator*>(tokenpair_one_or_two.get())->get_type_()]++;
                                         }
                                         else {
                                             break;
@@ -317,7 +317,7 @@ void laid_Token::laid (Engine & E)
                                     {
                                         E.EndGame();
                                     }
-                                        //E.controls[2]=false;
+                                        
 
                                 }
 
