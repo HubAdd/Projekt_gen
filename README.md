@@ -1,6 +1,6 @@
 # Ingenious Board Game - PC Version
 
-![Ingenious Logo](logo_projekt_1.png)
+![Ingenious Logo](Assets/Ingenious_logo/logo_projekt_1.png)
 
 Welcome to the PC version of the Ingenious board game! This repository contains the source code and assets for the digital adaptation of the popular board game designed by Reiner Knizia. If you are a fan of the original game eager to play on your PC, you'll find everything you need here.
 
@@ -10,6 +10,7 @@ Welcome to the PC version of the Ingenious board game! This repository contains 
 - [Features](#features)
 - [How to Play](#how-to-play)
 - [Contact](#contact)
+- [Links](#links)
 
 ## About the Game
 
@@ -40,6 +41,13 @@ If you have any questions, feel free to reach out:
 - **Email:** ingenious-support@example.com
 - **Discord:** [Join our community](discord_invite_link)
 - **Twitter:** [@IngeniousGame](https://twitter.com/IngeniousGame)
+
+
+## Links
+Below you can finds links to videos showing the game's interface and gameplay:
+
+- **Link:** https://drive.google.com/drive/folders/15fXvHaYUA8AwukUPFNt-EtNPU2ialWsx?usp=drive_link
+
 
 We hope you enjoy playing the PC version of Ingenious!
 
